@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class = "ui-mobile-rendering">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Leaving now...</title>
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+		<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+		<!-- <link rel="stylesheet" href="jquery.mobile-1.0.min.css" />
+		<script src="jquery-1.6.4.min.js"></script>
+		<script src="jquery.mobile-1.0.min.js"></script> -->
+	</head>
+	<body>
+		<!-- Start of first page: #one -->
+		<div data-role="page" id="one" >
+			<div data-role="header">
+				<h1>Leaving now...</h1>
+			</div>
+			<div data-role="content" >
+				<form id="CHN" action="/CHN/chn.php" method="post">
+					<fieldset>
+						<div class="input">
+							<label for="sender">Who are you:</label>
+							<input id="sender" name="sender" class="localStore" type="text" placeholder="Your Name..." size="40"/>
+						</div>
+						<div class="input">
+							<label for="home">Where you going:</label>
+							<input id="home" name="home" class="localStore" type="text" placeholder="Where you going..." size="40"/>
+						</div>
+						<fieldset data-role="controlgroup" data-mini="true" >
+							<legend>
+								How are you getting there:
+							</legend>
+							<input type="radio" name="mode" id="drive" class="localStore" value="driving" checked="checked" />
+							<label for="drive">Drive</label>
+							<input type="radio" name="mode" id="walk" class="localStore" value="walking"  />
+							<label for="walk">Walk</label>
+							<input type="radio" name="mode" id="bike" class="localStore" value="bicycling"  />
+							<label for="bike">Bike</label>
+						</fieldset>
+						<div class="input">
+							<label for="message">Message (optional):</label>
+							<input id="message" name="message" type="text" size="40"/>
+						</div>
+						<div data-role="fieldcontain">
+							<fieldset data-role="controlgroup" data-type="horizontal">
+								<input type="radio" name="sendwhat" id="sendSMS" class="localStore" value="sms" />
+								<label for="sendSMS">Send Text</label>
+								<input type="radio" name="sendwhat" id="sendEmail" class="localStore" value="email" checked/>
+								<label for="sendEmail">Send Email</label>
+							</fieldset>
+						</div>
+						<script>
+							$("#sendSMS").bind("click", function(event, ui) {
+								$("#smsdiv").show("fast");
+								$("#emaildiv").hide("fast");
+							});
+							$("#sendEmail").bind("click", function(event, ui) {
+								$("#smsdiv").hide("fast");
+								$("#emaildiv").show("fast");
+							});
+
+						</script>
+						<div class="ui-grid-a" id="smsdiv">
+							<div class="ui-block-a">
+								<label for="phone">Phone:</label>
+								<input id="phone" name="phone" class="localStore" type="tel" placeholder="(999)999-9999" size="12"/>
+							</div>
+							<div class="ui-block-b">
+								<label for="carrier">SMS Carrier:</label>
+								<select id="carrier"  class="localStore" name="carrier">
+									<option value="vtext.com">Verizon</option>
+									<option value="txt.att.net">AT&amp;T</option>
+									<option value="tmomail.net">T-Mobile</option>
+									<option value="cingularme.com">Cingular</option>
+									<option value="messaging.nextel.com">Nextel</option>
+									<option value="messaging.sprintpcs.com">Sprint</option>
+									<option value="vmobl.com">Virgin Mobile</option>
+								</select>
+							</div>
+						</div><!-- /grid-a -->
+						<div class="input" id="emaildiv">
+							<label for="email">Email:</label>
+							<input id="email" name="email" class="localStore" type="text" placeholder="spouse@address.com" size="40" />
+						</div>
+						<div class="input">
+							<label for="curr_lat">Latitude:</label>
+							<input id="curr_lat" name="curr_lat" type="text" readonly />
+						</div>
+						<div class="input">
+							<label for="cur_lng">Longitude:</label>
+							<input id="curr_lng" name="curr_lng" type="text" readonly />
+						</div>
+						<script>
+							if(navigator.geolocation) {
+								navigator.geolocation.getCurrentPosition(function(pos) {
+									$("#curr_lat").val(pos.coords.latitude);
+									$("#curr_lng").val(pos.coords.longitude);
+								})
+							} else {
+								error('not supported');
+							}
+						</script>
+						<div class="input">
+							<input type="submit" data-inline="true" value="Leaving now..." />
+						</div>
+						<script>
+							function init() {
+								//hide email options
+								$("#smsdiv").hide();
+								//prefill fields with class "localStore" from localstore
+								$('.localStore').each(function() {
+									var name = $(this).prop('name');
+									if(localStorage[name]) {
+										//console.log("Prefill ",$(this).prop('name'), " (id:" , $(this).prop('id'), ") field.val():", $(this).val(), " LS:",localStorage[name]);
+										if(name == "sendwhat") {
+											$("input:radio[name=sendwhat]").filter("[value=" + localStorage[name] + "]").click();
+										} else if(name == "carrier") {
+											$('#carrier').val(localStorage["carrier"]).prop('selected', true);
+											$('#carrier').selectmenu("refresh", true);
+										} else if(name == "mode") {
+											$("input:radio[name=mode]").filter("[value=" + localStorage[name] + "]").click();
+										} else {
+											$(this).val(localStorage[name]);
+										}
+										//console.log("DONE    ",$(this).prop('name'), " (id:" , $(this).prop('id'), ") field.val():", $(this).val(), " LS:",localStorage[name]);
+									};
+								});
+							};
+
+
+							$('.localStore').change(function() {// when keyup on field, update local store. Could use change()
+								localStorage[$(this).prop('name')] = $(this).val();
+							});
+
+			$(document).ready(function() {
+				// Your jQuery commands go here before the mobile reference
+				init();
+			});
+
+						</script>
+					</fieldset>
+				</form>
+				<br>
+				<br>
+				<p>
+					<a href="#popup" data-role="button" data-rel="dialog" data-transition="slideup">About</a>
+				</p>
+			</div><!-- /content -->
+			<div data-role="footer">
+				<h4> &copy; Copyright 2012, Sam Garst sgarst -at- gmaildotcom </h4>
+			</div><!-- /footer -->
+		</div><!-- /page one -->
+		<!-- "about" page: #popup -->
+		<div data-role="page" id="popup" data-theme="b">
+			<div data-role="header" >
+				<h1>Leaving now...</h1>
+			</div><!-- /header -->
+			<div data-role="content" >
+				<h2>About</h2>
+				<p>
+					"Leaving now..." scratches a very small itch. Let my wife know I'm leaving work, and when I'll get home. 
+					I built this after many many conversations with Thom Loring.
+				</p>				
+				<p>
+					How this could be better or more useful? sgarst at gmaildotcom
+				</p>
+				<p>
+					<a href="#one" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "Leaving now..."</a>
+				</p>
+			</div><!-- /content -->
+	</body>
+</html>
